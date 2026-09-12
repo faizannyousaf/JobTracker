@@ -156,11 +156,24 @@ fun LoginScreen(navController: NavController){
                         )
                     )
 
-                    Text(modifier = Modifier.padding(top = 12.dp),
-                        text = "Password",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp
-                    )
+
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(modifier = Modifier.padding(top = 12.dp),
+                            text = "Password",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp
+                        )
+                        Text(modifier = Modifier.padding(top = 12.dp)
+                            .clickable {
+                                navController.navigate("resetPassword")
+                            },
+                            text = "Forgot password?",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
+                        )
+                    }
+
 
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth()

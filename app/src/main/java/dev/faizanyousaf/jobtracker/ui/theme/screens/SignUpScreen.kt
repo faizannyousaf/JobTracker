@@ -60,7 +60,7 @@ fun SignUpScreen(navController: NavController){
             )
 
             Spacer(modifier = Modifier.size(10.dp))
-4
+
             Text(modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = "Sign up to get started",
                 fontSize = 20.sp,
