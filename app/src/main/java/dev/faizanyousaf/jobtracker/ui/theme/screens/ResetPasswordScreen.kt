@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -25,7 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -41,7 +40,10 @@ import dev.faizanyousaf.jobtracker.R
 
 @Composable
 fun ResetPasswordScreen(navController: NavController){
-    var email by rememberSaveable { mutableStateOf("") }
+
+
+    var email by remember { mutableStateOf("") }
+    var linkSent by remember { mutableStateOf(false) }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerpadding ->
 
@@ -71,6 +73,7 @@ fun ResetPasswordScreen(navController: NavController){
                 fontWeight = FontWeight.Light
             )
 
+
             Surface (modifier = Modifier
                 .padding(top = 50.dp, start = 20.dp, end = 20.dp)
                 .border(
@@ -82,52 +85,106 @@ fun ResetPasswordScreen(navController: NavController){
 
             ){
 
-                Column(modifier = Modifier.padding(20.dp)) {
+                if(!linkSent){
+                    Column(modifier = Modifier.padding(20.dp)) {
 
+                        Spacer(modifier = Modifier.size(10.dp))
 
-                    Spacer(modifier = Modifier.size(10.dp))
-
-                    Text(modifier = Modifier.padding(top = 12.dp),
-                        text = "Email address",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp
-                    )
-
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(top = 10.dp),
-                        value = email,
-                        onValueChange = { email = it },
-                        placeholder = { Text("you@example.com") },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.LightGray,
-                            focusedBorderColor = Color.LightGray
+                        Text(modifier = Modifier.padding(top = 12.dp),
+                            text = "Email address",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp
                         )
-                    )
+
+                        OutlinedTextField(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(top = 10.dp),
+                            value = email,
+                            onValueChange = { email = it },
+                            placeholder = { Text("you@example.com") },
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.LightGray,
+                                focusedBorderColor = Color.LightGray
+                            )
+                        )
 
 
-                    Button(onClick = {} ,
-                        modifier = Modifier.
-                        padding(top = 30.dp)
-                            .size(
-                                width = 500.dp,
-                                height = 60.dp
-                            ),
-                        shape = RoundedCornerShape(6.dp),
-                        colors = ButtonColors(
-                            Color.Black,
-                            contentColor = Color.White,
-                            disabledContainerColor = Color.Black,
-                            disabledContentColor = Color.Black
-                        )){
+                        Button(onClick = {
+                            linkSent = true
+                        } ,
+                            modifier = Modifier.
+                            padding(top = 30.dp)
+                                .size(
+                                    width = 500.dp,
+                                    height = 60.dp
+                                ),
+                            shape = RoundedCornerShape(6.dp),
+                            colors = ButtonColors(
+                                Color.Black,
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.Black,
+                                disabledContentColor = Color.Black
+                            )){
 
-                        Text("Send Reset Link")
+                            Text("Send Reset Link")
+                        }
+
                     }
+                }
+                else {
+                    Column(modifier = Modifier.padding(20.dp)
+                        .fillMaxWidth()) {
 
+                        Image(modifier = Modifier.size(120.dp)
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 40.dp),
+                            painter = painterResource(id = R.drawable.check_icon),
+                            contentDescription = stringResource(id = R.string.job_logo)
+                        )
+
+                        Text(modifier = Modifier.fillMaxWidth()
+                            .padding(top = 12.dp),
+                            textAlign = TextAlign.Center,
+                            text = "Check your inbox",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp
+                        )
+
+                        Text(modifier = Modifier.fillMaxWidth()
+                            .padding(top = 12.dp),
+                            textAlign = TextAlign.Center,
+                            text = "if your account exist, you'll receive a password reset link",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp
+                        )
+
+
+                        Button(onClick = {
+                        } ,
+                            modifier = Modifier.
+                            padding(top = 30.dp)
+                                .size(
+                                    width = 500.dp,
+                                    height = 60.dp
+                                ),
+                            shape = RoundedCornerShape(6.dp),
+                            colors = ButtonColors(
+                                Color.Black,
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.White,
+                                disabledContentColor = Color.White
+                            )){
+
+                            Text("Back to login")
+                        }
+
+                    }
                 }
 
             }
+
+
             Row(modifier = Modifier.fillMaxWidth()
                 .padding(top = 16.dp),
                 horizontalArrangement = Arrangement.Center){
@@ -146,12 +203,9 @@ fun ResetPasswordScreen(navController: NavController){
 
             }
 
-
         }
 
     }
-
-
 
 
 }
