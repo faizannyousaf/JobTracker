@@ -2,7 +2,6 @@ package dev.faizanyousaf.jobtracker.ui.theme.screens
 
 
 
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,13 +44,13 @@ fun LoginScreen(navController: NavController){
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
-    Scaffold(modifier = Modifier.fillMaxSize(),) {innerpadding ->
+    Scaffold(modifier = Modifier.fillMaxSize()) {innerpadding ->
 
         Column(modifier = Modifier.padding(innerpadding)) {
             Image(modifier = Modifier.size(120.dp)
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 40.dp),
-                painter = painterResource(id = R.drawable.job_tracker_logo),
+                painter = painterResource(id = R.drawable.login_screen_logo),
                 contentDescription = stringResource(id = R.string.job_logo)
             )
             Spacer(modifier = Modifier.size(10.dp))
@@ -83,7 +82,7 @@ fun LoginScreen(navController: NavController){
 
                 Column(modifier = Modifier.padding(20.dp)) {
 
-                    Button(onClick = {} ,
+                    Button({  } ,
                         modifier = Modifier.border( width = 1.dp,
                         color = Color.LightGray)
                             .size(
@@ -188,7 +187,9 @@ fun LoginScreen(navController: NavController){
                             focusedBorderColor = Color.LightGray)
                     )
 
-                    Button(onClick = {} ,
+                    Button(onClick = {
+                            navController.navigate("homeScreen")
+                    } ,
                         modifier = Modifier.
                         padding(top = 30.dp)
                             .size(
