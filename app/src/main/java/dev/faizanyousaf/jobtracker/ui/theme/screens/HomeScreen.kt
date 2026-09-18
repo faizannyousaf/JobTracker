@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import dev.faizanyousaf.jobtracker.R
+import dev.faizanyousaf.jobtracker.models.JobApplication
 import dev.faizanyousaf.jobtracker.ui.theme.AppliedAccent
 import dev.faizanyousaf.jobtracker.ui.theme.AppliedBg
 import dev.faizanyousaf.jobtracker.ui.theme.InProcessAccent
@@ -255,8 +258,35 @@ fun HomeScreen(navController: NavController){
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
+            val applications = listOf(
+                JobApplication("1", "Meta", "AI Engineer", "Sep 14", "Applied"),
+                JobApplication("2", "Google", "Android Engineer", "Sep 14", "Interview"),
+                JobApplication("3", "Amazon", "Software Engineer", "Sep 11", "Rejected")
+            )
+            Column {
+                applications.forEach{
+                    JobItem(it)
+                    HorizontalDivider(color = Color(0xFFF3F4F6))
+                }
+            }
 
+            Button(onClick = {} ,
+                modifier = Modifier.
+                padding(10.dp)
+                    .size(
+                        width = 500.dp,
+                        height = 60.dp
+                    ),
+                shape = RoundedCornerShape(6.dp),
+                colors = ButtonColors(
+                    Color(0xFFF9FAFB),
+                    contentColor = Color.Black,
+                    disabledContainerColor = Color.Black,
+                    disabledContentColor = Color.Black
+                )){
 
+                Text("View All")
+            }
 
         }
 
