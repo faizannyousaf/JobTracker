@@ -15,13 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -48,11 +48,7 @@ import dev.faizanyousaf.jobtracker.ui.theme.RejectionsBg
 @Composable
 fun HomeScreen(navController: NavController){
 
-    var applicationCount by rememberSaveable { mutableStateOf("0") }
-    var jobAppliedCount by rememberSaveable { mutableStateOf("0") }
-    var interviewsCount by rememberSaveable { mutableStateOf("0") }
-    var rejectionsCount by rememberSaveable { mutableStateOf("0") }
-    var offersCount by rememberSaveable { mutableStateOf("0") }
+    var applicationCount by rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerpadding->
 
@@ -102,153 +98,20 @@ fun HomeScreen(navController: NavController){
 
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                Surface (modifier = Modifier
-                    .padding(top = 50.dp, start = 20.dp, end = 20.dp)
-                    .width(170.dp)
-                    .height(100.dp)
-                    .border(
-                        width = 1.dp,
-                        color = Color.LightGray,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                    color = AppliedBg,
-                    shape = RoundedCornerShape(8.dp)
 
-                ){
+                ApplicationCountCard(0,"Applied",AppliedBg to AppliedAccent)
+                ApplicationCountCard(0,"In Process", InProcessBg to InProcessAccent)
 
-                    Column {
-                        Text(modifier = Modifier.align(Alignment.CenterHorizontally)
-                            .padding(top = 10.dp),
-                            text = jobAppliedCount,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AppliedAccent
-                        )
-
-                        Spacer(modifier = Modifier.size(10.dp))
-
-                        Text(modifier = Modifier.align(Alignment.CenterHorizontally),
-                            text = "Applied",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Light
-                        )
-                    }
-
-
-                }
-
-                Surface (modifier = Modifier
-                    .padding(top = 50.dp, start = 20.dp, end = 20.dp)
-                    .width(170.dp)
-                    .height(100.dp)
-                    .border(
-                        width = 1.dp,
-                        color = Color.LightGray,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                    color = InProcessBg,
-                    shape = RoundedCornerShape(8.dp)
-
-                ){
-
-                    Column {
-                        Text(modifier = Modifier.align(Alignment.CenterHorizontally)
-                            .padding(top = 10.dp),
-                            text = interviewsCount,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = InProcessAccent
-                        )
-
-                        Spacer(modifier = Modifier.size(10.dp))
-
-                        Text(modifier = Modifier.align(Alignment.CenterHorizontally),
-                            text = "In Process",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Light,
-                            color = Color.Black
-                        )
-                    }
-
-
-                }
             } // first row of job application status ends here
 
             Spacer(modifier = Modifier.size(10.dp))
 
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                Surface (modifier = Modifier
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-                    .width(170.dp)
-                    .height(100.dp)
-                    .border(
-                        width = 1.dp,
-                        color = Color.LightGray,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                    color = OffersBg,
-                    shape = RoundedCornerShape(8.dp)
 
-                ){
+                ApplicationCountCard(0,"Offers", OffersBg to OffersAccent)
+                ApplicationCountCard(0,"In Process", RejectionsBg to RejectionsAccent)
 
-                    Column {
-                        Text(modifier = Modifier.align(Alignment.CenterHorizontally)
-                            .padding(top = 10.dp),
-                            text = offersCount,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = OffersAccent
-                        )
-
-                        Spacer(modifier = Modifier.size(10.dp))
-
-                        Text(modifier = Modifier.align(Alignment.CenterHorizontally),
-                            text = "Offers",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Light,
-                            color = Color.Black
-                        )
-                    }
-
-
-                }
-
-                Surface (modifier = Modifier
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-                    .width(170.dp)
-                    .height(100.dp)
-                    .border(
-                        width = 1.dp,
-                        color = Color.LightGray,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                    color = RejectionsBg,
-                    shape = RoundedCornerShape(8.dp)
-
-                ){
-
-                    Column {
-                        Text(modifier = Modifier.align(Alignment.CenterHorizontally)
-                            .padding(top = 10.dp),
-                            text = rejectionsCount,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = RejectionsAccent
-                        )
-
-                        Spacer(modifier = Modifier.size(10.dp))
-
-                        Text(modifier = Modifier.align(Alignment.CenterHorizontally),
-                            text = "Rejections",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Light,
-                            color = Color.Black
-                        )
-                    }
-
-
-                }
             }// second row ends here
 
             Spacer(modifier = Modifier.size(10.dp))
@@ -289,6 +152,47 @@ fun HomeScreen(navController: NavController){
             }
 
         }
+
+    }
+}
+
+@Composable
+fun ApplicationCountCard(count: Int,label: String, colors: Pair<Color, Color>){
+
+    val (bg, accent) = colors
+    Surface (modifier = Modifier
+        .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+        .width(170.dp)
+        .height(100.dp)
+        .border(
+            width = 1.dp,
+            color = Color.LightGray,
+            shape = RoundedCornerShape(8.dp)
+        ),
+        color = bg,
+        shape = RoundedCornerShape(8.dp)
+
+    ){
+
+        Column {
+            Text(modifier = Modifier.align(Alignment.CenterHorizontally)
+                .padding(top = 10.dp),
+                text = count.toString(),
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                color = accent
+            )
+
+            Spacer(modifier = Modifier.size(10.dp))
+
+            Text(modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = label,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Light,
+                color = Color.Black
+            )
+        }
+
 
     }
 }

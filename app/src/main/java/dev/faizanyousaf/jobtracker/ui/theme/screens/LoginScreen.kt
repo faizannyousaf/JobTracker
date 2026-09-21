@@ -23,6 +23,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,13 +38,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import dev.faizanyousaf.jobtracker.R
+import dev.faizanyousaf.jobtracker.viewmodel.AuthState
+import dev.faizanyousaf.jobtracker.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(navController: NavController){
+    val viewModel: AuthViewModel = viewModel()
+    val authState by viewModel.authState.collectAsState()
+
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+
+    // Handle auth state changes
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.Success -> {
+                navController.navigate("homeScreen")
+            }
+            else -> {}
+        }
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) {innerpadding ->
 
@@ -188,7 +206,7 @@ fun LoginScreen(navController: NavController){
                     )
 
                     Button(onClick = {
-                            navController.navigate("homeScreen")
+                            viewModel.login(email, password)
                     } ,
                         modifier = Modifier.
                         padding(top = 30.dp)
