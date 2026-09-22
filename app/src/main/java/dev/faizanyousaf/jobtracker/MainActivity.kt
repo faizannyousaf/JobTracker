@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import dev.faizanyousaf.jobtracker.navigation.NavGraph
+import dev.faizanyousaf.jobtracker.repo.AuthRepository
 import dev.faizanyousaf.jobtracker.ui.theme.JobTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,8 +22,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             JobTrackerTheme {
+
                 val navController = rememberNavController()
-                NavGraph( navController, "login")
+                val repository = AuthRepository()
+                if(repository.currentUser()!= null){
+                    NavGraph( navController, "homeScreen")
+                }
+                else{
+                    NavGraph( navController, "login")
+                }
+
             }
         }
     }

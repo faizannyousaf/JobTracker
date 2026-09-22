@@ -22,6 +22,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,15 +37,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import dev.faizanyousaf.jobtracker.R
+import dev.faizanyousaf.jobtracker.viewmodel.AuthState
+import dev.faizanyousaf.jobtracker.viewmodel.AuthViewModel
 
 @Composable
 fun ResetPasswordScreen(navController: NavController){
-
+    val viewModel: AuthViewModel = viewModel()
+    val authState by viewModel.authState.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var linkSent by remember { mutableStateOf(false) }
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.Success -> {
+            linkSent = true
+            }
+            else -> {}
+        }
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerpadding ->
 
@@ -111,7 +126,7 @@ fun ResetPasswordScreen(navController: NavController){
 
 
                         Button(onClick = {
-                            linkSent = true
+                            viewModel.resetPassword(email)
                         } ,
                             modifier = Modifier.
                             padding(top = 30.dp)

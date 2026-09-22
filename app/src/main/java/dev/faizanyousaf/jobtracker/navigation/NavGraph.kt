@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.faizanyousaf.jobtracker.ui.theme.screens.AddJobScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.HomeScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.LoginScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.ResetPasswordScreen
@@ -34,6 +35,9 @@ fun NavGraph(navController: NavHostController = rememberNavController(),
         }
         composable(Screen.ResetPassword.route) {
             ResetPasswordScreen(navController)
+        }
+        composable(Screen.AddJobScreen.route) {
+            AddJobScreen(navController)
         }
 
     }

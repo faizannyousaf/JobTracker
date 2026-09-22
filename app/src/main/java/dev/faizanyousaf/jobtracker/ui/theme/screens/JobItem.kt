@@ -55,7 +55,7 @@ fun JobItem(jobApplication: JobApplication){
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
-                    Text(jobApplication.company, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    Text(jobApplication.company, fontWeight = FontWeight.SemiBold, fontSize = 17.sp)
                     Text(
                         "${jobApplication.role} · ${jobApplication.date}",
                         fontSize = 14.sp,

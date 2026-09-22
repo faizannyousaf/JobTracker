@@ -8,7 +8,6 @@ import kotlinx.coroutines.tasks.await
 
 class AuthRepository {
 
-
     private val auth = Firebase.auth
 
     suspend fun signUp(email: String, password: String): Result<FirebaseUser> {
