@@ -12,6 +12,7 @@ import dev.faizanyousaf.jobtracker.ui.theme.screens.HomeScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.LoginScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.ResetPasswordScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.SignUpScreen
+import dev.faizanyousaf.jobtracker.ui.theme.screens.ViewAllJobs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +40,9 @@ fun NavGraph(navController: NavHostController = rememberNavController(),
         composable(Screen.AddJobScreen.route) {
             AddJobScreen(navController)
         }
+     composable(Screen.ViewAllJobs.route) {
+             ViewAllJobs(navController)
+            }
 
     }
 

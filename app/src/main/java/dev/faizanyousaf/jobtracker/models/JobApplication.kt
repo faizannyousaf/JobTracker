@@ -11,10 +11,10 @@ import dev.faizanyousaf.jobtracker.ui.theme.RejectionsAccent
 import dev.faizanyousaf.jobtracker.ui.theme.RejectionsBg
 
 data class JobApplication(
-    val id: String,
+    val id: Int,
     val company: String,
     val role: String,
-    val date: String,
+    val date_applied: String,
     val status: String
 )
 

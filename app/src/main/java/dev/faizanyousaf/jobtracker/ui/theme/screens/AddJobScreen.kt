@@ -1,12 +1,19 @@
 package dev.faizanyousaf.jobtracker.ui.theme.screens
 
 
+import JobViewModel
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,6 +56,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -58,7 +66,9 @@ import java.util.Locale
 @Composable
 fun AddJobScreen(navController: NavController){
 
+    val jobViewModel: JobViewModel = viewModel()
 
+    var selectedStatus by remember { mutableStateOf("Applied") }
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let {
@@ -66,10 +76,10 @@ fun AddJobScreen(navController: NavController){
     } ?: ""
 
 
-    var email by rememberSaveable { mutableStateOf("") }
-    var emailError by rememberSaveable { mutableStateOf(false) }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordError by rememberSaveable { mutableStateOf(false) }
+    var company by rememberSaveable { mutableStateOf("") }
+    var companyError by rememberSaveable { mutableStateOf(false) }
+    var role by rememberSaveable { mutableStateOf("") }
+    var roleError by rememberSaveable { mutableStateOf(false) }
     var loginFailedError by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(modifier = Modifier.fillMaxSize(),
@@ -102,12 +112,12 @@ fun AddJobScreen(navController: NavController){
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 10.dp),
-                value = email,
-                onValueChange = { email = it
-                    emailError = false},
-                isError = emailError,
+                value = company,
+                onValueChange = { company = it
+                    companyError = false},
+                isError = companyError,
                 supportingText = {
-                    if (emailError) {
+                    if (companyError) {
                         Text("Email cannot be empty")
                     }
                 },
@@ -129,13 +139,12 @@ fun AddJobScreen(navController: NavController){
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 10.dp),
-                value = password,
-                onValueChange = { password = it
-                    passwordError = false},
-                visualTransformation = PasswordVisualTransformation(),
-                isError = passwordError,
+                value = role,
+                onValueChange = { role = it
+                    roleError = false},
+                isError = roleError,
                 supportingText = {
-                    if (passwordError) {
+                    if (roleError) {
                         Text("Email cannot be empty")
                     }
                 },
@@ -191,17 +200,22 @@ fun AddJobScreen(navController: NavController){
                         }
                     }
                 }
-
+            StatusPicker(
+                selectedStatus = selectedStatus,
+                onStatusSelected = { selectedStatus = it }
+            )
 
             Button(onClick = {
-                if(email.isEmpty()){
-                    emailError = true
+                if(company.isEmpty()){
+                    companyError = true
                 }
-                if( password.isEmpty()){
-                    passwordError = true
+                if( role.isEmpty()){
+                    roleError = true
                 }
                 else{
-                 //   viewModel.login(email, password)
+                    jobViewModel.addJob(company,role, selectedDate,selectedStatus)
+                    navController.navigate("homeScreen")
+
                 }
 
             } ,
@@ -294,5 +308,52 @@ fun DatePickerModal(
         }
     ) {
         DatePicker(state = datePickerState)
+    }
+}
+
+@Composable
+fun StatusPicker(
+    selectedStatus: String,
+    onStatusSelected: (String) -> Unit
+) {
+    val statuses = listOf("Applied", "Interview", "Offer", "Rejected")
+
+    Column {
+        Text(
+            text = "Status",
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 13.sp,
+            color = Color(0xFF374151)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            statuses.forEach { status ->
+                val isSelected = status == selectedStatus
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = if (isSelected) Color(0xFF111827) else Color(0xFFF9FAFB),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = if (isSelected) Color.Transparent else Color(0xFFE5E7EB),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .clickable { onStatusSelected(status) }
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = status,
+                        color = if (isSelected) Color.White else Color(0xFF6B7280),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
     }
 }

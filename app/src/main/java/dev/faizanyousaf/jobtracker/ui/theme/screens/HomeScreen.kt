@@ -1,5 +1,7 @@
 package dev.faizanyousaf.jobtracker.ui.theme.screens
 
+import JobViewModel
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,12 +23,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import dev.faizanyousaf.jobtracker.R
 import dev.faizanyousaf.jobtracker.models.JobApplication
@@ -50,6 +53,7 @@ import dev.faizanyousaf.jobtracker.ui.theme.AppliedAccent
 import dev.faizanyousaf.jobtracker.ui.theme.AppliedBg
 import dev.faizanyousaf.jobtracker.ui.theme.InProcessAccent
 import dev.faizanyousaf.jobtracker.ui.theme.InProcessBg
+import dev.faizanyousaf.jobtracker.ui.theme.Items.JobItem
 import dev.faizanyousaf.jobtracker.ui.theme.OffersAccent
 import dev.faizanyousaf.jobtracker.ui.theme.OffersBg
 import dev.faizanyousaf.jobtracker.ui.theme.RejectionsAccent
@@ -59,9 +63,13 @@ import dev.faizanyousaf.jobtracker.ui.theme.RejectionsBg
 fun HomeScreen(navController: NavController){
 
     val authRepository = AuthRepository()
+    val jobViewModel: JobViewModel = viewModel()
+    val jobs by jobViewModel.jobs.collectAsState()
+
     var applicationCount by rememberSaveable { mutableIntStateOf(0) }
     var menuExpanded by remember { mutableStateOf(false) }
     Scaffold(modifier = Modifier.fillMaxSize()) { innerpadding->
+        jobViewModel.loadJobs()
 
         Column(modifier = Modifier.padding(innerpadding)
             .fillMaxSize()) {
@@ -188,19 +196,15 @@ fun HomeScreen(navController: NavController){
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-            val applications = listOf(
-                JobApplication("1", "Meta", "AI Engineer", "Sep 14", "Applied"),
-                JobApplication("2", "Google", "Android Engineer", "Sep 14", "Interview"),
-                JobApplication("3", "Amazon", "Software Engineer", "Sep 11", "Rejected")
-            )
+
             Column {
-                applications.forEach{
+                jobs.take(4).forEach{
                     JobItem(it)
                     HorizontalDivider(color = Color(0xFFF3F4F6))
                 }
             }
 
-            Button(onClick = {} ,
+            Button(onClick = {navController.navigate("viewAll")} ,
                 modifier = Modifier.
                 padding(10.dp)
                     .size(
