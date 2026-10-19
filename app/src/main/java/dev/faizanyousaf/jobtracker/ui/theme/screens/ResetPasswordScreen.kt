@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -44,37 +45,55 @@ import dev.faizanyousaf.jobtracker.viewmodel.AuthState
 import dev.faizanyousaf.jobtracker.viewmodel.AuthViewModel
 
 @Composable
-fun ResetPasswordScreen(navController: NavController){
+fun ResetPasswordScreen(navController: NavController) {
     val viewModel: AuthViewModel = viewModel()
     val authState by viewModel.authState.collectAsState()
 
     var email by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf<String?>(null) }
     var linkSent by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState) {
         when (authState) {
-            is AuthState.Success -> {
-            linkSent = true
+            is AuthState.PasswordResetSent -> {
+                linkSent = true
             }
             else -> {}
         }
     }
 
+    fun validateAndSend() {
+        if (email.isEmpty()) {
+            emailError = "Email cannot be empty"
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailError = "Please enter a valid email"
+        } else {
+            emailError = null
+            viewModel.resetPassword(email)
+        }
+    }
+
     Scaffold(modifier = Modifier.fillMaxSize()) { innerpadding ->
 
-        Column(modifier = Modifier.padding(innerpadding)
-            .fillMaxSize(),
+        Column(
+            modifier = Modifier
+                .padding(innerpadding)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-            Image(modifier = Modifier.size(120.dp)
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 40.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                modifier = Modifier
+                    .size(120.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 40.dp),
                 painter = painterResource(id = R.drawable.email_logo),
                 contentDescription = stringResource(id = R.string.job_logo)
             )
             Spacer(modifier = Modifier.size(10.dp))
 
-            Text(modifier = Modifier.align(Alignment.CenterHorizontally),
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = "Reset Password",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
@@ -82,40 +101,59 @@ fun ResetPasswordScreen(navController: NavController){
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            Text(modifier = Modifier.align(Alignment.CenterHorizontally),
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = "We'll send you a link to reset",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Light
             )
 
-
-            Surface (modifier = Modifier
-                .padding(top = 50.dp, start = 20.dp, end = 20.dp)
-                .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                    shape = RoundedCornerShape(8.dp)
-                ),
+            Surface(
+                modifier = Modifier
+                    .padding(top = 50.dp, start = 20.dp, end = 20.dp)
+                    .border(
+                        width = 1.dp,
+                        color = Color.LightGray,
+                        shape = RoundedCornerShape(8.dp)
+                    ),
                 shape = RoundedCornerShape(8.dp)
+            ) {
 
-            ){
-
-                if(!linkSent){
+                if (!linkSent) {
                     Column(modifier = Modifier.padding(20.dp)) {
 
                         Spacer(modifier = Modifier.size(10.dp))
 
-                        Text(modifier = Modifier.padding(top = 12.dp),
+                        // Firebase error message
+                        if (authState is AuthState.Error) {
+                            Text(
+                                text = (authState as AuthState.Error).message,
+                                color = Color.Red,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
+                        }
+
+                        Text(
+                            modifier = Modifier.padding(top = 12.dp),
                             text = "Email address",
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 18.sp
                         )
 
                         OutlinedTextField(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(top = 10.dp),
                             value = email,
-                            onValueChange = { email = it },
+                            onValueChange = {
+                                email = it
+                                emailError = null
+                            },
+                            isError = emailError != null,
+                            supportingText = {
+                                emailError?.let { Text(it) }
+                            },
                             placeholder = { Text("you@example.com") },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -124,103 +162,108 @@ fun ResetPasswordScreen(navController: NavController){
                             )
                         )
 
-
-                        Button(onClick = {
-                            viewModel.resetPassword(email)
-                        } ,
-                            modifier = Modifier.
-                            padding(top = 30.dp)
-                                .size(
-                                    width = 500.dp,
-                                    height = 60.dp
-                                ),
+                        Button(
+                            onClick = { validateAndSend() },
+                            enabled = authState !is AuthState.Loading,
+                            modifier = Modifier
+                                .padding(top = 30.dp)
+                                .size(width = 500.dp, height = 60.dp),
                             shape = RoundedCornerShape(6.dp),
                             colors = ButtonColors(
                                 Color.Black,
                                 contentColor = Color.White,
-                                disabledContainerColor = Color.Black,
-                                disabledContentColor = Color.Black
-                            )){
-
-                            Text("Send Reset Link")
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.White
+                            )
+                        ) {
+                            if (authState is AuthState.Loading) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            } else {
+                                Text("Send Reset Link")
+                            }
                         }
-
                     }
-                }
-                else {
-                    Column(modifier = Modifier.padding(20.dp)
-                        .fillMaxWidth()) {
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth()
+                    ) {
 
-                        Image(modifier = Modifier.size(120.dp)
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = 40.dp),
+                        Image(
+                            modifier = Modifier
+                                .size(120.dp)
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 40.dp),
                             painter = painterResource(id = R.drawable.check_icon),
                             contentDescription = stringResource(id = R.string.job_logo)
                         )
 
-                        Text(modifier = Modifier.fillMaxWidth()
-                            .padding(top = 12.dp),
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp),
                             textAlign = TextAlign.Center,
                             text = "Check your inbox",
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 18.sp
                         )
 
-                        Text(modifier = Modifier.fillMaxWidth()
-                            .padding(top = 12.dp),
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp),
                             textAlign = TextAlign.Center,
-                            text = "if your account exist, you'll receive a password reset link",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 18.sp
+                            text = "If your account exists, you'll receive a password reset link",
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp,
+                            color = Color.Gray
                         )
 
-
-                        Button(onClick = {
-                        } ,
-                            modifier = Modifier.
-                            padding(top = 30.dp)
-                                .size(
-                                    width = 500.dp,
-                                    height = 60.dp
-                                ),
+                        Button(
+                            onClick = { navController.navigate("login") },
+                            modifier = Modifier
+                                .padding(top = 30.dp)
+                                .size(width = 500.dp, height = 60.dp),
                             shape = RoundedCornerShape(6.dp),
                             colors = ButtonColors(
                                 Color.Black,
                                 contentColor = Color.White,
                                 disabledContainerColor = Color.White,
                                 disabledContentColor = Color.White
-                            )){
-
+                            )
+                        ) {
                             Text("Back to login")
                         }
-
                     }
                 }
-
             }
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    modifier = Modifier.size(22.dp),
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
 
-            Row(modifier = Modifier.fillMaxWidth()
-                .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.Center){
-
-                Image(modifier = Modifier.size(22.dp), imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back")
-
-                Text( modifier = Modifier.
-                clickable {
-                    navController.navigate("login")
-                }, text = " Back to login",
+                Text(
+                    modifier = Modifier.clickable {
+                        navController.navigate("login")
+                    },
+                    text = " Back to login",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
-
             }
-
         }
-
     }
-
-
 }

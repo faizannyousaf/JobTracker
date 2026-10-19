@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,6 +67,7 @@ import java.util.Locale
 @Composable
 fun AddJobScreen(navController: NavController){
 
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val jobViewModel: JobViewModel = viewModel()
 
     var selectedStatus by remember { mutableStateOf("Applied") }
@@ -85,11 +87,11 @@ fun AddJobScreen(navController: NavController){
     Scaffold(modifier = Modifier.fillMaxSize(),
     topBar =     {
             TopAppBar(
-                title = { Text("Add A Job")},
+                title = { Text("Add A Job", fontSize = 18.sp)},
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            modifier = Modifier.size(30.dp),
+                            modifier = Modifier.size(24.dp),
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )

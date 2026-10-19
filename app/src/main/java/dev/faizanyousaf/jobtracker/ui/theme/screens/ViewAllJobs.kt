@@ -1,6 +1,7 @@
 package dev.faizanyousaf.jobtracker.ui.theme.screens
 
 import JobViewModel
+import StatusUpdateSheet
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -43,7 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import dev.faizanyousaf.jobtracker.models.statusColor
+import dev.faizanyousaf.jobtracker.models.JobApplication
+import dev.faizanyousaf.jobtracker.models.statusColors
 import dev.faizanyousaf.jobtracker.ui.theme.Items.JobItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,6 +61,7 @@ fun ViewAllJobs(
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf("All") }
+    var selectedJob by remember { mutableStateOf<JobApplication?>(null) }
 
     val filters = listOf("All", "Applied", "Interview", "Offer", "Rejected")
 
@@ -87,6 +90,20 @@ fun ViewAllJobs(
             )
         }
     ){innerPadding ->
+        selectedJob?.let { job ->
+            StatusUpdateSheet(
+                application = job,
+                onDismiss = { selectedJob = null },
+                onSave = { newStatus ->
+                    jobViewModel.updateJob(job.copy(status = newStatus))
+                    selectedJob = null
+                },
+                onDelete = {
+                    jobViewModel.deleteJob(job.id)
+                    selectedJob = null
+                }
+            )
+        }
 
         Column(modifier = Modifier.fillMaxSize().
             padding(innerPadding)
@@ -120,7 +137,7 @@ fun ViewAllJobs(
                     val (bg, accent) = if (filter == "All") {
                         Color(0xFF111827) to Color.White
                     } else {
-                        statusColor(filter)
+                        statusColors(filter)
                     }
 
                     Box(
@@ -155,7 +172,11 @@ fun ViewAllJobs(
             } else {
                 LazyColumn {
                     items(filteredApplications) { application ->
-                        JobItem(application)
+                        JobItem(
+                            application,
+                            onDelete = { jobViewModel.deleteJob(application.id) },
+                            onClick = { selectedJob = application }
+                        )
                         HorizontalDivider(color = Color(0xFFF3F4F6))
                     }
                 }

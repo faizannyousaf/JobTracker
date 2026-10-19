@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -35,6 +37,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,274 +53,238 @@ import dev.faizanyousaf.jobtracker.viewmodel.AuthState
 import dev.faizanyousaf.jobtracker.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(navController: NavController) {
     val viewModel: AuthViewModel = viewModel()
     val authState by viewModel.authState.collectAsState()
 
     var email by rememberSaveable { mutableStateOf("") }
-    var emailError by rememberSaveable { mutableStateOf(false) }
+    var emailError by rememberSaveable { mutableStateOf<String?>(null) }
     var password by rememberSaveable { mutableStateOf("") }
-    var passwordError by rememberSaveable { mutableStateOf(false) }
-    var loginFailedError by rememberSaveable { mutableStateOf(false) }
+    var passwordError by rememberSaveable { mutableStateOf<String?>(null) }
 
-    // Handle auth state changes
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> {
-                navController.navigate("homeScreen")
-                Log.d("Successs","Login Success")
+                navController.navigate("homeScreen") {
+                    popUpTo("login") { inclusive = true }
+                }
             }
+
             else -> {}
         }
     }
 
-    when (authState) {
-        is AuthState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-              //  CircularProgressIndicator()
-            }
-        }
-        is AuthState.Error ->{
-            loginFailedError = true
-            Log.d("ERRRORR","Login Failed")
-            navController.navigate("login")
-            loginFailedError = true
-        }
-        else ->
-            {
-            Scaffold(modifier = Modifier.fillMaxSize()) {innerpadding ->
 
-                Column(modifier = Modifier.padding(innerpadding)) {
-                    Image(modifier = Modifier
+    fun validateAndLogin() {
+
+
+        var isValid = true
+
+        if (email.isEmpty()) {
+            emailError = "Email cannot be empty"
+            isValid = false
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailError = "Please enter a valid email"
+            isValid = false
+        } else {
+            emailError = null
+        }
+
+        if (password.isEmpty()) {
+            passwordError = "Password cannot be empty"
+            isValid = false
+        } else {
+            passwordError = null
+        }
+
+        if (isValid) {
+            viewModel.login(email, password)
+        }
+    }
+
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerpadding ->
+
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                    })
+                }
+        ) {
+            // your content
+
+            Column(modifier = Modifier.padding(innerpadding)) {
+                Image(
+                    modifier = Modifier
                         .size(120.dp)
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 40.dp),
-                        painter = painterResource(id = R.drawable.login_screen_logo),
-                        contentDescription = stringResource(id = R.string.job_logo)
-                    )
-                    Spacer(modifier = Modifier.size(10.dp))
+                    painter = painterResource(id = R.drawable.login_screen_logo),
+                    contentDescription = stringResource(id = R.string.job_logo)
+                )
+                Spacer(modifier = Modifier.size(10.dp))
 
-                    Text(modifier = Modifier.align(Alignment.CenterHorizontally),
-                        text = "Welcome Back",
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "Welcome Back",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold
+                )
 
-                    Spacer(modifier = Modifier.size(10.dp))
+                Spacer(modifier = Modifier.size(10.dp))
 
-                    Text(modifier = Modifier.align(Alignment.CenterHorizontally),
-                        text = "Log in to your account",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Light
-                    )
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "Log in to your account",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Light
+                )
 
-                    Surface (modifier = Modifier
+                Surface(
+                    modifier = Modifier
                         .padding(top = 50.dp, start = 20.dp, end = 20.dp)
                         .border(
                             width = 1.dp,
                             color = Color.LightGray,
                             shape = RoundedCornerShape(8.dp)
                         ),
-                        shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp)
+                ) {
 
-                    ){
+                    Column(modifier = Modifier.padding(20.dp)) {
 
-                        Column(modifier = Modifier.padding(20.dp)) {
 
-                            Button({  } ,
-                                modifier = Modifier
-                                    .border(
-                                        width = 1.dp,
-                                        color = Color.LightGray
-                                    )
-                                    .size(
-                                        width = 500.dp,
-                                        height = 60.dp
-                                    ),
-                                shape = RoundedCornerShape(6.dp),
-                                colors = ButtonColors(
-                                    Color.Transparent,
-                                    contentColor = Color.Black,
-                                    disabledContainerColor = Color.Transparent,
-                                    disabledContentColor = Color.Transparent
-                                )) {
+                        // Firebase error message
+                        if (authState is AuthState.Error) {
+                            Text(
+                                text = (authState as AuthState.Error).message,
+                                color = Color.Red,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(top = 12.dp)
+                            )
+                        }
 
-                                Row(modifier = Modifier.padding(10.dp)) {
-                                    Image(modifier = Modifier.size(25.dp),
-                                        painter = painterResource(id = R.drawable.google_logo),
-                                        contentDescription = stringResource(id = R.string.job_logo)
-                                    )
-                                    Spacer(modifier = Modifier.size(25.dp))
+                        Text(
+                            modifier = Modifier.padding(top = 12.dp),
+                            text = "Email",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp
+                        )
 
-                                    Text( text = "Continue with Google",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Medium)
-                                }
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp),
+                            value = email,
+                            onValueChange = {
+                                email = it
+                                emailError = null
+                            },
+                            isError = emailError != null,
+                            supportingText = {
+                                emailError?.let { Text(it) }
+                            },
+                            placeholder = { Text("you@example.com") },
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.LightGray,
+                                focusedBorderColor = Color.LightGray
+                            )
+                        )
 
-                            }
-                            Spacer(modifier = Modifier.size(10.dp))
-
-                            Row() {
-                                HorizontalDivider(
-                                    modifier = Modifier
-                                        .size(width = 150.dp, height = 20.dp)
-                                        .padding(top = 16.dp, end = 10.dp),
-                                    color = Color.LightGray,
-                                    thickness = 1.dp
-                                )
-                                Text(modifier = Modifier.padding(top = 5.dp), text = "OR",
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.LightGray
-                                )
-                                HorizontalDivider(
-                                    modifier = Modifier
-                                        .size(
-                                            width = 170.dp,
-                                            height = 20.dp
-                                        )
-                                        .padding(top = 16.dp, start = 10.dp),
-                                    color = Color.LightGray,
-                                    thickness = 1.dp
-                                )
-
-                            }
-
-                            Text(modifier = Modifier.padding(top = 12.dp),
-                                text = "Email",
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(top = 12.dp),
+                                text = "Password",
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 18.sp
                             )
-
-                            OutlinedTextField(
+                            Text(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 10.dp),
-                                value = email,
-                                onValueChange = { email = it
-                                    emailError = false},
-                                isError = emailError,
-                                supportingText = {
-                                    if (emailError) {
-                                        Text("Email cannot be empty")
-                                    }
-                                },
-                                placeholder = { Text("you@example.com") },
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedBorderColor = Color.LightGray,
-                                    focusedBorderColor = Color.LightGray
-                                )
-                            )
-
-
-                            Row(modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(modifier = Modifier.padding(top = 12.dp),
-                                    text = "Password",
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 18.sp
-                                )
-                                Text(modifier = Modifier
                                     .padding(top = 12.dp)
                                     .clickable {
                                         navController.navigate("resetPassword")
                                     },
-                                    text = "Forgot password?",
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp
-                                )
-                            }
-
-
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 10.dp),
-                                value = password,
-                                onValueChange = { password = it
-                                                passwordError = false},
-                                visualTransformation = PasswordVisualTransformation(),
-                                isError = passwordError,
-                                supportingText = {
-                                    if (passwordError) {
-                                        Text("Email cannot be empty")
-                                    }
-                                },
-                                placeholder = { Text(".......") },
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedBorderColor = Color.LightGray,
-                                    focusedBorderColor = Color.LightGray)
+                                text = "Forgot password?",
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp
                             )
-                            if(loginFailedError)
-                            {
-                                Text("Login Failed",
-                                    color = Color.Red,
-                                    fontSize = 18.sp,
-                                    )
-                            }
-
-
-                            Button(onClick = {
-                                if(email.isEmpty()){
-                                    emailError = true
-                                }
-                                if( password.isEmpty()){
-                                    passwordError = true
-                                }
-                                else{
-                                    viewModel.login(email, password)
-                                }
-
-                            } ,
-                                modifier = Modifier
-                                    .padding(top = 30.dp)
-                                    .size(
-                                        width = 500.dp,
-                                        height = 60.dp
-                                    ),
-                                shape = RoundedCornerShape(6.dp),
-                                colors = ButtonColors(
-                                    Color.Black,
-                                    contentColor = Color.White,
-                                    disabledContainerColor = Color.Black,
-                                    disabledContentColor = Color.Black
-                                )){
-
-                                Text("Log in")
-                            }
-
                         }
 
-                    }
-                    Row(modifier = Modifier.padding(start = 70.dp, bottom = 20.dp,top = 20.dp)){
-                        Text( text = "Don't have an account?",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.LightGray
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp),
+                            value = password,
+                            onValueChange = {
+                                password = it
+                                passwordError = null
+                            },
+                            visualTransformation = PasswordVisualTransformation(),
+                            isError = passwordError != null,
+                            supportingText = {
+                                passwordError?.let { Text(it) }
+                            },
+                            placeholder = { Text(".......") },
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.LightGray,
+                                focusedBorderColor = Color.LightGray
+                            )
                         )
-                        Text(modifier = Modifier.clickable { navController.navigate("signup") }, text = " Create one",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Black
-                        )
 
+                        Button(
+                            onClick = { validateAndLogin() },
+                            enabled = authState !is AuthState.Loading,
+                            modifier = Modifier
+                                .padding(top = 30.dp)
+                                .size(width = 500.dp, height = 60.dp),
+                            shape = RoundedCornerShape(6.dp),
+                            colors = ButtonColors(
+                                MaterialTheme.colorScheme.onBackground,
+                                contentColor = MaterialTheme.colorScheme.background ,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.White
+                            )
+                        ) {
+                            if (authState is AuthState.Loading) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            } else {
+                                Text("Log in")
+                            }
+                        }
                     }
-
-
                 }
 
+                Row(modifier = Modifier.padding(start = 70.dp, bottom = 20.dp, top = 20.dp)) {
+                    Text(
+                        text = "Don't have an account?",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.LightGray
+                    )
+                    Text(
+                        modifier = Modifier.clickable { navController.navigate("signup") },
+                        text = " Create one",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     }
-
-
-
-
-
-
 }

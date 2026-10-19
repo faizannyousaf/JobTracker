@@ -4,9 +4,9 @@ class JobRepository {
 
     private val api = RetrofitClient.jobApi
 
-    suspend fun getJobs(): Result<List<JobApplication>> {
+    suspend fun getJobs(userId : String): Result<List<JobApplication>> {
         return try {
-            val jobs = api.getJobs()
+            val jobs = api.getJobs(userId)
             Result.success(jobs)
         } catch (e: Exception) {
             Result.failure(e)
@@ -29,5 +29,10 @@ class JobRepository {
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    // JobRepository.kt - add this
+    suspend fun updateJob(job: JobApplication): JobApplication {
+        return RetrofitClient.jobApi.updateJob(job.id, job)
     }
 }

@@ -1,5 +1,6 @@
 package dev.faizanyousaf.jobtracker.navigation
 
+import HomeScreen
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -8,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.faizanyousaf.jobtracker.ui.theme.screens.AddJobScreen
-import dev.faizanyousaf.jobtracker.ui.theme.screens.HomeScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.LoginScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.ResetPasswordScreen
 import dev.faizanyousaf.jobtracker.ui.theme.screens.SignUpScreen

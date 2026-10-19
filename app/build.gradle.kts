@@ -13,8 +13,8 @@ android {
         applicationId = "dev.faizanyousaf.jobtracker"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 6
+        versionName = "1.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -64,8 +64,9 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.recaptcha:recaptcha:18.4.0")
 
     // For await() on Firebase tasks
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
